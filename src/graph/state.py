@@ -13,3 +13,6 @@ class State(TypedDict, total=False):
     nota_operador: str
     resposta_llm: str
     resultado: str
+    tentativas: int
+    problemas: list
+    tentar_de_novo: bool

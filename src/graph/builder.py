@@ -10,6 +10,7 @@ from src.graph.nodes.human_review import human_review
 from src.graph.nodes.prepare import prepare
 from src.graph.nodes.receive import receive
 from src.graph.nodes.refuse import refuse
+from src.graph.nodes.validate import route_validate, validate
 from src.graph.routing import route_by_intent
 from src.graph.state import State
 from src.graph.tools import TOOLS
@@ -22,6 +23,7 @@ def build_graph():
     graph.add_node("prepare", prepare)
     graph.add_node("analyze", analyze)
     graph.add_node("tools", ToolNode(TOOLS))
+    graph.add_node("validate", validate)
     graph.add_node("human_review", human_review)
     graph.add_node("format_output", format_output)
     graph.add_node("answer_rules", answer_rules)
@@ -40,9 +42,12 @@ def build_graph():
     )
     graph.add_edge("prepare", "analyze")
     graph.add_conditional_edges(
-        "analyze", tools_condition, {"tools": "tools", END: "human_review"}
+        "analyze", tools_condition, {"tools": "tools", END: "validate"}
     )
     graph.add_edge("tools", "analyze")
+    graph.add_conditional_edges(
+        "validate", route_validate, {"analyze": "analyze", "human_review": "human_review"}
+    )
     graph.add_edge("human_review", "format_output")
     graph.add_edge("format_output", END)
     graph.add_edge("answer_rules", END)
